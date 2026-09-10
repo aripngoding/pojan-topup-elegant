@@ -11,7 +11,7 @@ export type Denom = {
   id: string;
   label: string;
   price: number;
-  bonus?: string;
+  bonus?: string | undefined;
 };
 
 export type Product = {
