@@ -153,3 +153,16 @@
     color: var(--color-foreground);
   }
 }
+
+@utility bg-gradient-line {
+  background-image: var(--gradient-line);
+}
+
+@layer base {
+  body {
+    font-family: var(--font-sans);
+  }
+  .font-display {
+    font-family: var(--font-display);
+  }
+}
