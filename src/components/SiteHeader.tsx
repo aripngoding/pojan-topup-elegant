@@ -1,7 +1,32 @@
-import { Link } from "@tanstack/react-router";
-import { Search, ShieldCheck, Zap, Headphones } from "lucide-react";
+import { Link, useRouter } from "@tanstack/react-router";
+import { Search, ShieldCheck, Zap, Headphones, LogOut, User } from "lucide-react";
+import { useState, useEffect } from "react";
+import { getCurrentUser, logout } from "@/lib/server-fns";
+
+type SafeUser = {
+  id: number;
+  username: string;
+  displayName: string;
+  email: string;
+  role: "user" | "admin";
+};
 
 export function SiteHeader() {
+  const router = useRouter();
+  const [user, setUser] = useState<SafeUser | null | undefined>(undefined); // undefined = loading
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    getCurrentUser().then(setUser).catch(() => setUser(null));
+  }, []);
+
+  async function handleLogout() {
+    await logout();
+    setUser(null);
+    setMenuOpen(false);
+    router.navigate({ to: "/" });
+  }
+
   return (
     <header className="sticky top-0 z-50">
       <div className="bg-primary text-primary-foreground">
@@ -31,9 +56,58 @@ export function SiteHeader() {
             >
               Cek Pesanan
             </Link>
-            <button className="rounded-xl bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground transition hover:brightness-105">
-              Masuk
-            </button>
+
+            {/* Auth area */}
+            {user === undefined ? (
+              // Loading skeleton
+              <div className="h-9 w-20 animate-pulse rounded-xl bg-primary-soft" />
+            ) : user ? (
+              // Logged in
+              <div className="relative">
+                <button
+                  onClick={() => setMenuOpen((v) => !v)}
+                  className="flex items-center gap-2 rounded-xl bg-primary-soft px-3 py-2 text-sm font-medium transition hover:bg-primary-soft/80"
+                >
+                  <span className="flex size-6 items-center justify-center rounded-full bg-accent text-xs font-bold text-accent-foreground">
+                    {user.displayName.charAt(0).toUpperCase()}
+                  </span>
+                  <span className="hidden sm:block">{user.displayName}</span>
+                </button>
+
+                {menuOpen && (
+                  <div className="absolute right-0 top-full mt-2 w-48 rounded-2xl border border-border bg-card p-1.5 shadow-elegant">
+                    <div className="px-3 py-2">
+                      <p className="text-xs font-semibold text-foreground">{user.displayName}</p>
+                      <p className="truncate text-[11px] text-muted-foreground">{user.email}</p>
+                    </div>
+                    <div className="my-1 h-px bg-border" />
+                    {user.role === "admin" && (
+                      <Link
+                        to="/admin"
+                        onClick={() => setMenuOpen(false)}
+                        className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm text-foreground transition hover:bg-primary-soft"
+                      >
+                        <User className="size-4" /> Admin Panel
+                      </Link>
+                    )}
+                    <button
+                      onClick={handleLogout}
+                      className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm text-destructive transition hover:bg-destructive/10"
+                    >
+                      <LogOut className="size-4" /> Keluar
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              // Not logged in
+              <Link
+                to="/login"
+                className="rounded-xl bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground transition hover:brightness-105"
+              >
+                Masuk
+              </Link>
+            )}
           </nav>
         </div>
       </div>

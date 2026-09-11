@@ -47,7 +47,7 @@ const categories = [
 ];
 
 function Home() {
-  const [tab, setTab] = useState<"Semua" | "Games" | "Voucher" | "Hiburan">("Semua");
+  const [tab, setTab] = useState<"Semua" | "Games" | "Voucher" | "Hiburan" | "E-Money" | "Pulsa & Data">("Semua");
   const filtered = tab === "Semua" ? products : products.filter((p) => p.category === tab);
   const popular = products.slice(0, 4);
 
@@ -166,7 +166,7 @@ function Home() {
       <section id="katalog" className="mx-auto mt-16 max-w-7xl px-4">
         <SectionHead title="Katalog Top Up" subtitle="Pilih produk, semua diproses otomatis" />
         <div className="mt-5 flex flex-wrap gap-2">
-          {(["Semua", "Games", "Voucher", "Hiburan"] as const).map((t) => (
+          {(["Semua", "Games", "Voucher", "Hiburan", "E-Money", "Pulsa & Data"] as const).map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
